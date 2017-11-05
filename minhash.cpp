@@ -20,27 +20,66 @@ CountEstimator<T>::CountEstimator(T& object, std::list<long> hash_list, int n, l
 		cout<<"Due to an issue with khmer, only odd ksizes are allowed\n";
 		exit(0);
 	}
-	this->_ksize = ksize;
-	this->_hash_list = hash_list;
+	this->ksize = ksize;
+	this->hash_list = hash_list;
 	// get a prime to use for hashing
 	long p = get_prime_lt_x(max_prime);
 	this->p = p;
 	// initialize sketch to size n
-	
-
+	this->_mins.assign(n,p);
+	// initialize the corresponding counts
+	this->_counts.assign(n,0);
+	// initialize the list of kmers used, if appropriate
+	if(save_kmers == 'y')
+	{
+		this->_kmers.assign(n,"");
+	}
+	else
+	{
+		this->_kmers.clear();
+	}
+	// Initialize file name (if appropriate)
+	this->_input_file_name = input_file_name;
+	if(this->_input_file_name != NULL)
+	{
+		this->parse_file(rev_comp=rev_comp);
+	}
+	// Optional container for the true number of k-mers in the genome used to populate the sketch
+	this->_true_num_kmers = 0;
 
 }
 
 template <typename T>
-void CountEstimator<T>::parse_file()
+void CountEstimator<T>::parse_file(bool rev_comp)
 {
+	/* opens a file and populates the CountEstimator with it */
 
 }
 
 template <typename T>
-void CountEstimator<T>::down_sample()
+void CountEstimator<T>::down_sample(long h)
 {
-
+	/* This will down-sample a sketch to have exactly h elements
+        :param h: number of elements you wish to save
+        :return: None */
+	std::list<long> temp1 ;
+	std::list<long> temp2 ;
+	std::list<long> temp3 ;
+	std::list<long>::iterator it1 =this->_mins.begin();
+	std::list<long>::iterator it2 =this->_counts.begin();
+	std::list<long>::iterator it3 =this->_kmers.begin();
+	for(int i=0; i<h; i++)
+	{
+		temp1.push_back(*it1);
+		it1++;
+		temp2.push_back(*it2);
+		it2++;
+		temp3.push_back(*it3);
+		it3++;
+	}
+	this->_mins = temp1;
+	this->_counts = temp2;
+	this->_kmers = temp3;
 }
 
 template <typename T>

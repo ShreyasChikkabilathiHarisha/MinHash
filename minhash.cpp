@@ -83,15 +83,102 @@ void CountEstimator<T>::down_sample(long h)
 }
 
 template <typename T>
-void CountEstimator<T>::add()
+void CountEstimator<T>::add(bool rev_comp)
 {
+	/* Add kmer into sketch, keeping sketch sorted, update counts accordingly */
+	_mins = this->_mins;
+	_counts = this->_counts;
+	_kmers = this->_kmers;
+	uint64_t h;
+	if(rev_comp)
+	{
+		if(h)
+		{
 
+		}
+	}
+	else
+	{
+
+	}
+	h = h % this->p;
+	if(this->hash_list)
+	{
+		bool flag = false;
+		for(std::list<long>::iterator it =this->hash_list.begin(); it!=this->hash_list.end(); it++)
+		{
+			if(h==*it)
+			{
+				flag = true;
+				break;
+			}
+		}
+		if(flag==false)
+		{
+			return;
+		}
+	}
+	if(h>=_mins.end())
+	{
+		return;
+	}
+	// bisect function
+	long i=0;
+	bool foundIndex = false;
+	for(std::list<long>::iterator it =this->_mins.begin(); it!=this->_mins.end(); it++)
+	{
+			if(h==*it)
+			{
+				foundIndex = true;
+				break;
+			}
+			i++;
+	}
+	std::list<long>::iterator it4 =this->_mins.begin();
+	std::list<long>::iterator it5 =this->_counts.begin();
+	std::list<std::string>::iterator it6 =this->_kmers.begin();
+	if(foundIndex == true)
+	{
+		for(long q=0; q<i;q++)
+		{
+			it4++;
+			it5++;
+			it6++;
+		}
+		(*it4) +=1;
+		return;
+	}
+	else    // otherwise insert h, initialize counts to 1, and insert kmer if necessary
+	{
+		_mins.insert(it4, h);
+		_mins.pop_back();
+		_counts.insert(it5, 1);
+		_counts.pop_back();
+		if(_kmers)
+		{
+			_kmers.insert(it6,h);
+			_kmers.pop_back();
+		}
+		return;
+	}
 }
 
 template <typename T>
-void CountEstimator<T>::add_sequence()
+void CountEstimator<T>::add_sequence(std::string seq, bool rev_comp)
 {
-
+	/* Sanitize and add a sequence to the sketch. */
+	std::transform(seq.begin(), seq.end(), seq.begin(), std::ptr_fun<int, int>(std::toupper));
+	for (std::string::size_type l = 0; l < seq.length(); ++l)
+    {
+        if(seq[l] != 'A' && seq[l] != 'C' && seq[l] != 'T' && seq[l] != 'G')
+        {
+            seq[l] = 'G';
+        }
+    }
+	// for()
+	// {
+	// 	this->add();
+	// }
 }
 
 template <typename T>
@@ -135,6 +222,8 @@ void CountEstimator<T>::jaccard_vector()
 {
 
 }
+
+
 
 bool is_prime(int number)
 {
@@ -186,9 +275,45 @@ long get_prime_lt_x(long target)
 	}
 }
 
+//typedef unsigned __int64 uint64_t;
+
+// 64-bit hash for 64-bit platforms
+uint64_t MurmurHash64A ( const void * key, int len, unsigned int seed )
+{
+	const uint64_t m = 0xc6a4a7935bd1e995;
+	const int r = 47;
+	uint64_t h = seed ^ (len * m);
+	const uint64_t * data = (const uint64_t *)key;
+	const uint64_t * end = data + (len/8);
+	while(data != end)
+	{
+		uint64_t k = *data++;
+		k *= m; 
+		k ^= k >> r; 
+		k *= m;
+		h ^= k;
+		h *= m; 
+	}
+	const unsigned char * data2 = (const unsigned char*)data;
+	switch(len & 7)
+	{
+	case 7: h ^= uint64_t(data2[6]) << 48;
+	case 6: h ^= uint64_t(data2[5]) << 40;
+	case 5: h ^= uint64_t(data2[4]) << 32;
+	case 4: h ^= uint64_t(data2[3]) << 24;
+	case 3: h ^= uint64_t(data2[2]) << 16;
+	case 2: h ^= uint64_t(data2[1]) << 8;
+	case 1: h ^= uint64_t(data2[0]);
+	        h *= m;
+	};
+	h ^= h >> r;
+	h *= m;
+	h ^= h >> r;
+	return h;
+}
+
 int main()
 {
     cout<<"success\n";
-
     return 0;
 }

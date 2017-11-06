@@ -2,6 +2,11 @@
 #include <string>
 #include <list>
 #include <cmath>
+#include <inttypes.h>
+#include <algorithm>  
+#include <functional>
+#include <cctype>
+#include <cstring>
 
 template <typename T >
 class CountEstimator
@@ -26,8 +31,8 @@ public:
 	CountEstimator(T& object, std::list<long> hash_list, int n = 0, long max_prime = 9999999999971, int ksize = 0, std::string input_file_name = NULL, char save_kmers = 'n', bool rev_comp = false);
 	void parse_file(bool rev_comp=false);
 	void down_sample(long h);
-	void add();
-	void add_sequence();
+	void add(bool rev_comp=false);
+	void add_sequence(std::string seq, bool rev_comp=false);
 	void jaccard_count();
 	void jaccard();
 	void common_count();
@@ -41,4 +46,5 @@ public:
 
 };
 
+uint64_t MurmurHash64A ( const void * key, int len, unsigned int seed );
 int main();

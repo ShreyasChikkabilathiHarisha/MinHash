@@ -83,7 +83,7 @@ void CountEstimator<T>::down_sample(long h)
 }
 
 template <typename T>
-void CountEstimator<T>::add(bool rev_comp)
+void CountEstimator<T>::add(std::string kmer, bool rev_comp)
 {
 	/* Add kmer into sketch, keeping sketch sorted, update counts accordingly */
 	_mins = this->_mins;
@@ -92,14 +92,17 @@ void CountEstimator<T>::add(bool rev_comp)
 	uint64_t h;
 	if(rev_comp)
 	{
-		if(h)
+		uint64_t h1 = MurmurHash64A(kmer,ksize,ksize); // Have to check the 2nd and 3rd arguments of murmurHash function call
+		uint64_t h2 = MurmurHash64A(kmer,ksize,ksize); // have to implement "h2 = khmer.hash_murmur3(khmer.reverse_complement(kmer))"
+		h=(h1<h2)?h1:h2;
+		if(h == h2)
 		{
-
+			// kmer = khmer.reverse_complement(kmer)
 		}
 	}
 	else
 	{
-
+		h = MurmurHash64A(kmer,ksize,ksize);
 	}
 	h = h % this->p;
 	if(this->hash_list)
@@ -156,7 +159,7 @@ void CountEstimator<T>::add(bool rev_comp)
 		_counts.pop_back();
 		if(_kmers)
 		{
-			_kmers.insert(it6,h);
+			_kmers.insert(it6,kmer);
 			_kmers.pop_back();
 		}
 		return;
@@ -175,10 +178,19 @@ void CountEstimator<T>::add_sequence(std::string seq, bool rev_comp)
             seq[l] = 'G';
         }
     }
-	// for()
-	// {
-	// 	this->add();
-	// }
+	string temp = "                              ";
+	int i=0;
+	while(seq[i+this->ksize-1]!='\0')
+	{
+		cout<<"in "<<i<<endl;
+		for(int j=i;j<(i+this->ksize);j++)
+		{
+			cout<<"out "<<j<<endl;
+			temp[j-i] = seq[j];
+		}
+		add(temp,rev_comp);
+		i++;
+	}
 }
 
 template <typename T>

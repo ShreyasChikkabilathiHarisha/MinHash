@@ -83,7 +83,7 @@ void CountEstimator<T>::down_sample(long h)
 }
 
 template <typename T>
-void CountEstimator<T>::add(std::string kmer, bool rev_comp)
+void CountEstimator<T>::add(T& kmer, bool rev_comp)
 {
 	/* Add kmer into sketch, keeping sketch sorted, update counts accordingly */
 	_mins = this->_mins;
@@ -121,7 +121,7 @@ void CountEstimator<T>::add(std::string kmer, bool rev_comp)
 			return;
 		}
 	}
-	if(h>=_mins.end())
+	if(h>=*(_mins.end()))
 	{
 		return;
 	}

@@ -6,13 +6,16 @@ LINKER_OPT       = -L/usr/lib -lstdc++ -lm
 
 BUILD_LIST+=basicWorkflow
 
-all: $(BUILD_LIST)
+all: $(BUILD_LIST) minhash 
 
 $(BUILD_LIST) : %: %.cpp bloom_filter.hpp
-	$(COMPILER) $(OPTIONS) -o $@ $@.cpp $(LINKER_OPT)
+	$(COMPILER) -std=c++11  -o $@ $@.cpp $(LINKER_OPT)
+
+minhash : 
+	$(COMPILER) -std=c++11 -o $@ $@.cpp 
 
 clean:
-	rm -f $(BUILD_LIST) core *.o *.bak *stackdump *#
+	rm -f $(BUILD_LIST) minhash core *.o *.bak *stackdump *#
 
 #
 # The End !

@@ -2,9 +2,14 @@
 
 using namespace std;
 
-template <typename T>
-CountEstimator<T>::CountEstimator(T& object, std::list<long> hash_list, int n, long max_prime, int ksize, std::string input_file_name, char save_kmers, bool rev_comp)
+CountEstimator::CountEstimator()
 {
+	cout<<"CountEstimator::CountEstimator - Default"<<endl;
+}
+
+CountEstimator::CountEstimator(std::list<long> hash_list, int n, long max_prime, int ksize, std::string input_file_name, char save_kmers, bool rev_comp)
+{
+	cout<<"CountEstimator::CountEstimator - Begin"<<endl;
 	if(n == 0)
 	{
 		cout<<"n=0 exception\n";
@@ -39,35 +44,35 @@ CountEstimator<T>::CountEstimator(T& object, std::list<long> hash_list, int n, l
 		this->_kmers.clear();
 	}
 	// Initialize file name (if appropriate)
-	this->_input_file_name = input_file_name;
-	if(this->_input_file_name != NULL)
+	this->input_file_name = input_file_name;
+	if(this->input_file_name != "\0")
 	{
 		this->parse_file(rev_comp=rev_comp);
 	}
 	// Optional container for the true number of k-mers in the genome used to populate the sketch
 	this->_true_num_kmers = 0;
-
+	cout<<"CountEstimator::CountEstimator - end"<<endl;
 }
 
-template <typename T>
-void CountEstimator<T>::parse_file(bool rev_comp)
+//template <typename T>
+void CountEstimator::parse_file(bool rev_comp)
 {
 	/* opens a file and populates the CountEstimator with it */
 
 }
 
-template <typename T>
-void CountEstimator<T>::down_sample(long h)
+//template <typename T>
+void CountEstimator::down_sample(long h)
 {
 	/* This will down-sample a sketch to have exactly h elements
         :param h: number of elements you wish to save
         :return: None */
 	std::list<long> temp1 ;
 	std::list<long> temp2 ;
-	std::list<long> temp3 ;
+	std::list<string> temp3 ;
 	std::list<long>::iterator it1 =this->_mins.begin();
 	std::list<long>::iterator it2 =this->_counts.begin();
-	std::list<long>::iterator it3 =this->_kmers.begin();
+	std::list<std::string>::iterator it3 =this->_kmers.begin();
 	for(int i=0; i<h; i++)
 	{
 		temp1.push_back(*it1);
@@ -82,9 +87,10 @@ void CountEstimator<T>::down_sample(long h)
 	this->_kmers = temp3;
 }
 
-template <typename T>
-void CountEstimator<T>::add(T& kmer, bool rev_comp)
+//template <typename T>
+void CountEstimator::add(std::string kmer, bool rev_comp)
 {
+	cout<<"CountEstimator::add - begin"<<endl;
 	/* Add kmer into sketch, keeping sketch sorted, update counts accordingly */
 	_mins = this->_mins;
 	_counts = this->_counts;
@@ -92,8 +98,8 @@ void CountEstimator<T>::add(T& kmer, bool rev_comp)
 	uint64_t h;
 	if(rev_comp)
 	{
-		uint64_t h1 = MurmurHash64A(kmer,ksize,ksize); // Have to check the 2nd and 3rd arguments of murmurHash function call
-		uint64_t h2 = MurmurHash64A(kmer,ksize,ksize); // have to implement "h2 = khmer.hash_murmur3(khmer.reverse_complement(kmer))"
+		uint64_t h1 = MurmurHash64A(&kmer,ksize,ksize); // Have to check the 2nd and 3rd arguments of murmurHash function call
+		uint64_t h2 = MurmurHash64A(&kmer,ksize,ksize); // have to implement "h2 = khmer.hash_murmur3(khmer.reverse_complement(kmer))"
 		h=(h1<h2)?h1:h2;
 		if(h == h2)
 		{
@@ -102,10 +108,10 @@ void CountEstimator<T>::add(T& kmer, bool rev_comp)
 	}
 	else
 	{
-		h = MurmurHash64A(kmer,ksize,ksize);
+		h = MurmurHash64A(&kmer,ksize,ksize);
 	}
 	h = h % this->p;
-	if(this->hash_list)
+	if(!this->hash_list.empty())
 	{
 		bool flag = false;
 		for(std::list<long>::iterator it =this->hash_list.begin(); it!=this->hash_list.end(); it++)
@@ -157,18 +163,20 @@ void CountEstimator<T>::add(T& kmer, bool rev_comp)
 		_mins.pop_back();
 		_counts.insert(it5, 1);
 		_counts.pop_back();
-		if(_kmers)
+		if(!_kmers.empty())
 		{
 			_kmers.insert(it6,kmer);
 			_kmers.pop_back();
 		}
 		return;
 	}
+	cout<<"CountEstimator::add - end"<<endl;
 }
 
-template <typename T>
-void CountEstimator<T>::add_sequence(std::string seq, bool rev_comp)
+//template <typename T>
+void CountEstimator::add_sequence(std::string seq, bool rev_comp)
 {
+	cout<<"CountEstimator::add_sequence - Begin"<<endl;
 	/* Sanitize and add a sequence to the sketch. */
 	std::transform(seq.begin(), seq.end(), seq.begin(), std::ptr_fun<int, int>(std::toupper));
 	for (std::string::size_type l = 0; l < seq.length(); ++l)
@@ -191,46 +199,47 @@ void CountEstimator<T>::add_sequence(std::string seq, bool rev_comp)
 		add(temp,rev_comp);
 		i++;
 	}
+	cout<<"CountEstimator::add_sequence - end"<<endl;
 }
 
-template <typename T>
-void CountEstimator<T>::jaccard_count()
+//template <typename T>
+void CountEstimator::jaccard_count()
 {
 
 }
 
-template <typename T>
-void CountEstimator<T>::common_count()
+//template <typename T>
+void CountEstimator::common_count()
 {
 
 }
 
-template <typename T>
-void CountEstimator<T>::common()
+//template <typename T>
+void CountEstimator::common()
 {
 
 }
 
-template <typename T>
-void CountEstimator<T>::_truncate()
+//template <typename T>
+void CountEstimator::_truncate()
 {
 
 }
 
-template <typename T>
-void CountEstimator<T>::_export()
+//template <typename T>
+void CountEstimator::_export()
 {
 
 }
 
-template <typename T>
-void CountEstimator<T>::count_vector()
+//template <typename T>
+void CountEstimator::count_vector()
 {
 
 }
 
-template <typename T>
-void CountEstimator<T>::jaccard_vector()
+//template <typename T>
+void CountEstimator::jaccard_vector()
 {
 
 }
@@ -251,9 +260,9 @@ bool is_prime(int number)
 	{
 		return false;
 	}
-	for(int i =3; i<(int(pow(number,0.5))+1); i+=2)
+	for(int j =3; j<(int(pow(number,0.5))+1); j+=2)
 	{
-		if((number%i) == 0)
+		if((number%j) == 0)
 		{
 			return false;
 		}
@@ -261,13 +270,13 @@ bool is_prime(int number)
 	return true;
 }
 
-long get_prime_lt_x(long target)
+long get_prime_lt_x(long t)
 {
-	if(target == 1)
+	if(t == 1)
 	{
 		return 1;
 	}
-	int i = int(target);
+	int i = int(t);
 	if( (i%2) == 0 )
 	{
 		i -= 1;
@@ -282,7 +291,7 @@ long get_prime_lt_x(long target)
 	}
 	if(i <= 0)
 	{
-		cout<<"unable to find a prime number < "<< target <<endl;
+		cout<<"unable to find a prime number < "<< t <<endl;
 		exit(0);
 	}
 }
@@ -327,5 +336,9 @@ uint64_t MurmurHash64A ( const void * key, int len, unsigned int seed )
 int main()
 {
     cout<<"success\n";
+    std::string p = "hello";
+    uint64_t h = MurmurHash64A(&p,11,11);
+    cout<<"murmur : "<<h<<endl;
+    std::list<long> hash_list;
     return 0;
 }

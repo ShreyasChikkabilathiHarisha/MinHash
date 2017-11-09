@@ -19,7 +19,7 @@ private:
 	long max_prime = 9999999999971;
 	int ksize = 0;
 	long p;
-	std::string input_file_name = NULL;
+	std::string input_file_name = "";
 	char save_kmers = 'n';
 	std::list<long> hash_list ;
 	bool rev_comp=false;
@@ -48,4 +48,4 @@ public:
 uint64_t MurmurHash64A ( const void * key, int len, unsigned int seed );
 bool is_prime(int number);
 long get_prime_lt_x(long t);
-int main();
+//int main();

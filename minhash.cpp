@@ -87,7 +87,6 @@ void CountEstimator::down_sample(long h)
 	this->_kmers = temp3;
 }
 
-//template <typename T>
 void CountEstimator::add(std::string kmer, bool rev_comp)
 {
 	cout<<"CountEstimator::add - begin"<<endl;
@@ -190,15 +189,17 @@ void CountEstimator::add_sequence(std::string seq, bool rev_comp)
 	int i=0;
 	while(seq[i+this->ksize-1]!='\0')
 	{
-		cout<<"in "<<i<<endl;
 		for(int j=i;j<(i+this->ksize);j++)
 		{
-			cout<<"out "<<j<<endl;
 			temp[j-i] = seq[j];
 		}
 		add(temp,rev_comp);
 		i++;
 	}
+//	for(std::list<string>::iterator it =this->_kmers.begin(); it!=this->_kmers.end(); it++)
+//        {
+//		cout<<*it<<endl;
+//	}
 	cout<<"CountEstimator::add_sequence - end"<<endl;
 }
 
@@ -332,13 +333,16 @@ uint64_t MurmurHash64A ( const void * key, int len, unsigned int seed )
 	h ^= h >> r;
 	return h;
 }
-
+/*
 int main()
 {
     cout<<"success\n";
-    std::string p = "hello";
+    std::string p = "abcdefghijklmnopqrstuvwxyz";
     uint64_t h = MurmurHash64A(&p,11,11);
     cout<<"murmur : "<<h<<endl;
     std::list<long> hash_list;
+    CountEstimator ch(hash_list, 5000, 9999999999971, 11, "", 'y', false);
+    ch.add_sequence(p, false);
     return 0;
 }
+*/

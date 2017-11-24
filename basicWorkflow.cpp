@@ -3,7 +3,9 @@
 #include <algorithm>  
 #include <vector>
 
+#include "minhash.hpp"
 #include "bloom_filter.hpp"
+
 using namespace std;
 
 void generateKmers(string &aLargeString, const uint &aKmerSize, vector<string> *aKmerVect, const uint numKmers){
@@ -86,7 +88,7 @@ int main()
    //"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
    // test strings, one small, other long
    string small_string = "CTACGCAAGGGTACCGCGACCTCAATGCTTGCACGTTACTCCTCTGCCGTTAACATGTCTTCAGGTTGATCAAGCTGACTAGCACTTGATTTCCAGGATA";
-   string large_string = "CCGCATCGACAAGCAGGATCTGGATCTATTTCTCTCTTAAATCCATGTAAGGGACGGCAGAAACCTGCTCCTTCTACTTGCTACATCTTCTAGGGTAGAACGAGACCAGAGCCGTTACTGCGATATGAAATCAGTACCGAACGTTGGAACTTATTCAGTTTTAACCCGGTCCCCGTCGCCCAAATCGGGCTATATCATACCCCCGGGCCAAGTGTACAAGTGCATCGATTAAATGCACTAACGGCGAAAGTAAATGATGGACTTTCCAAGCCTGAGGTGGTAAACGCACTTGAATAGAGTCGACAAATTATCGGCTGACGATGCCTTGTAGACCAGCTTTAACACATGACCAGTATAGACGAGGCGGAACTAAGCAATCCCAAGTTTTCGTGCGAGCTGAAGGACCCGGCTCCACGAGATAGAGCTTGTGTTAACAAGAGGCCTCCGGCTGGAAAGATTGGTGGAAACGGCTGCTGTCACGTTTGCATCTTACCGGATGTGCCCCAATGAGGAGTTGATGAACTGGCTGTGACGCAATGGCGAAGAGGAAACGTCTGTATGGCGGATGTAACGTTTTTGCAACACTCCTCCACAACTGCTCCTTTAAGATGACCATCACGAAAATGAAGCTCGTTCGAAATCTTCAAAGATCCGGGGTATAATTGCGCTTCCGGGAGAAGGCCATATGCGATAGCGGTAAGTTTCCACAGCGTATCCAAAAGCGGAGCTTTACGATCTCCCCAGTAAACTGGCTTGTGTCAAGCGGCGAACCCGAATTTCGACGAACCTAGATATTCTCTGGCGACTAACTACTATGCGGATGGGCCTATTCGGGGGATTCAGCCCGCGATACTAGAGCGTAATTAGCCTCGCAAGAATCTAGGTAGCCCCAAAATAGCTTGCTAAAGCGCTAGGGTGCACTGCAGGCAAAATCGAGGTGACTGTACCCCGAGCCATGCATATAACTGGGGGGTACCCTTCCAATAATTGTTATCATACCATCTGCATAGACATATTTAACGGCTCAGTAAATTCGTCGCCATGCGACCTCCAGCATGATCGGTGGCACTCCGTTGTGCGCGGACTGTGTAAACCGCACG" + small_string;
+   string large_string = "CCGCATCGACAAGCAGGATCTGGATCTATTTCTCTCTTAAATCCATGTAAGGGACGGCAGAAACCTGCTCCTTCTACTTGCTACATCTTCTAGGGTAGAACGAGACCAGAGCCGTTACTGCGATATGAAATCAGTACCGAACGTTGGAACTTATTCAGTTTTAACCCGGTCCCCGTCGCCCAAATCGGGCTATATCATACCCCCGGGCCAAGTGTACAAGTGCATCGATTAAATGCACTAACGGCGAAAGTAAATGATGGACTTTCCAAGCCTGAGGTGGTAAACGCACTTGAATAGAGTCGACAAATTATCGGCTGACGATGCCTTGTAGACCAGCTTTAACACATGACCAGTATAGACGAGGCGGAACTAAGCAATCCCAAGTTTTCGTGCGAGCTGAAGGACCCGGCTCCACGAGATAGAGCTTGTGTTAACAAGAGGCCTCCGGCTGGAAAGATTGGTGGAAACGGCTGCTGTCACGTTTGCATCTTACCGGATGTGCCCCAATGAGGAGTTGATGAACTGGCTGTGACGCAATGGCGAAGAGGAAACGTCTGTATGGCGGATGTAACGTTTTTGCAACACTCCTCCACAACTGCTCCTTTAAGATGACCATCACGAAAATGAAGCTCGTTCGAAATCTTCAAAGATCCGGGGTATAATTGCGCTTCCGGGAGAAGGCCATATGCGATAGCGGTAAGTTTCCACAGCGTATCCAAAAGCGGAGCTTTACGATCTCCCCAGTAAACTGGCTTGTGTCAAGCGGCGAACCCGAATTTCGACGAACCTAGATATTCTCTGGCGACTAACTACTATGCGGATGGGCCTATTCGGGGGATTCAGCCCGCGATACTAGAGCGTAATTAGCCTCGCAAGAATCTAGGTAGCCCCAAAATAGCTTGCTAAAGCGCTAGGGTGCACTGCAGGCAAAATCGAGGTGACTGTACCCCGAGCCATGCATATAACTGGGGGGTACCCTTCCAATAATTGTTATCATACC" + small_string;
    
    // Kmer size
    const uint ksize = 11;
@@ -97,7 +99,7 @@ int main()
    // num kmers formed from each string
    uint size_B = large_string.length() - ksize + 1 ;
    uint size_A = small_string.length() - ksize + 1 ;
-   // num kmers inserted inserted into bloom filter without collision
+   // num kmers inserted into bloom filter without collision
    uint size_B_est = 0;
 
    cout << "size_B :" << size_B << endl;
@@ -117,9 +119,16 @@ int main()
    // calcualte true jaccard index (intersection/union)
    float true_jaccard = trueJaccards(kmersB, kmersA);
 
+
+   CountEstimator ch(10, 9999999999971, 11, "", 'y', NULL, false);
+   ch.add_sequence(small_string, false);
+   //cout << "hashList Size : " << hash_list.size() << endl;
+
+
+
    bloom_parameters parameters;
    // How many elements roughly do we expect to insert?
-   parameters.projected_element_count = 1090;
+   parameters.projected_element_count = 1.15*large_string.length();
    // Maximum tolerable false positive probability? (0,1)
    parameters.false_positive_probability = prob_error_rate; // 1 in 100
    // Simple randomizer (optional)
@@ -137,13 +146,26 @@ int main()
          size_B_est++;
       }
       else{
-         //cout << "string already present in bloom_filter" << endl;
+         cout << "string already present in bloom_filter : " << kmersB->at(i) << endl;
       }
    }
    cout << "size_B_est :" << size_B_est << endl;
-   uint int_est = 0;
+   float int_est = 0;
    // Query Bloom Filter
       // Query the existence of strings
+   #if 1
+   // cout << "kmers list : A" << endl;
+   for (auto& kmer : ch.get_kmers_list()){
+      //cout << i << endl;
+      if (!kmer.empty() && filter.contains(kmer)){
+         int_est++;
+         // cout << "BF contains " << kmer << endl;
+      }
+      else{
+         cout << "BF doesnot contain " << kmer << endl;
+      }
+   }
+   #else
    for (size_t i = 0; i < size_A; ++i)
    {
       if (filter.contains(kmersA->at(i)))
@@ -155,15 +177,16 @@ int main()
          cout << "BF doesnot contain" << kmersA->at(i) << endl;
       }
    }
+   #endif
 
    // we divide intersection estimate by h until we get minhash working.
-   int_est = int_est / h;
+   //int_est = int_est / h;
    cout << "int_est : " << int_est << endl;
    int_est -= h * prob_error_rate;
    cout << "int_est (after adjustment): " << int_est << endl;
    float containment_est, jaccard_est;
-   // need not divide by h now, but need to modify after min hash implementation
    containment_est = int_est /(float) h;
+   // need not divide by h now, but need to modify after min hash implementation
    //containment_est = int_est ;
 
    jaccard_est = size_A * containment_est / (size_A + size_B_est - size_A * containment_est);

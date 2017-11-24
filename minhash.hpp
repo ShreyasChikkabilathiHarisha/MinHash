@@ -7,6 +7,8 @@
 #include <functional>
 #include <cctype>
 #include <cstring>
+#include <cstdlib>
+#include <ctime>
 
 //template <typename T >
 class CountEstimator
@@ -21,7 +23,7 @@ private:
 	long p;
 	std::string input_file_name = "";
 	char save_kmers = 'n';
-	std::list<long> hash_list ;
+	std::list<long> *hash_list = NULL;
 	bool rev_comp=false;
 	std::list<long> _mins ;
 	std::list<long> _counts ;
@@ -30,7 +32,8 @@ private:
 
 public:
 	CountEstimator();
-	CountEstimator(std::list<long> hash_list, int n, long max_prime, int ksize, std::string input_file_name, char save_kmers, bool rev_comp);
+	CountEstimator(int n, long max_prime, int ksize, std::string input_file_name, 
+				char save_kmers, std::list<long> *hash_list, bool rev_comp);
 	void parse_file(bool rev_comp);
 	void down_sample(long h);
 	void add(std::string kmer, bool rev_comp);
@@ -43,6 +46,8 @@ public:
 	void _export();
 	void count_vector();
 	void jaccard_vector();
+	std::list<std::string>& get_kmers_list(){return _kmers;};
+
 };
 
 uint64_t MurmurHash64A ( const void * key, int len, unsigned int seed );

@@ -1,21 +1,27 @@
 COMPILER         = -g++
-#COMPILER        = -clang
+# COMPILER        = -clang
 OPTIMIZATION_OPT = -O3
-OPTIONS          = -pedantic-errors -ansi -Wall -Wextra -Werror -Wno-long-long $(OPTIMIZATION_OPT)
+# OPTIONS          = -pedantic-errors -ansi -Wall -Wextra -Werror -Wno-long-long $(OPTIMIZATION_OPT) -std=c++11
 LINKER_OPT       = -L/usr/lib -lstdc++ -lm
 
-BUILD_LIST+=basicWorkflow
+# BUILD_LIST+=basicWorkflow
+# all: $(BUILD_LIST) minhash 
+# $(BUILD_LIST) : %: %.cpp bloom_filter.hpp
+	# $(COMPILER) -std=c++11  -o $@ $@.cpp $(LINKER_OPT)
 
-all: $(BUILD_LIST) minhash 
+.PHONY: all
+all : minhash.o basicWorkflow
 
-$(BUILD_LIST) : %: %.cpp bloom_filter.hpp
-	$(COMPILER) -std=c++11  -o $@ $@.cpp $(LINKER_OPT)
+basicWorkflow: 
+	$(COMPILER) $(OPTIONS) -o $@ $@.cpp bloom_filter.hpp minhash.o
 
-minhash : 
-	$(COMPILER) -std=c++11 -o $@ $@.cpp 
+minhash.o : 
+	$(COMPILER) $(OPTIONS) -c minhash.cpp
 
+.PHOHY: clean
 clean:
-	rm -f $(BUILD_LIST) minhash core *.o *.bak *stackdump *#
+	rm -f basicWorkflow core *.o *.bak *stackdump *#
+
 
 #
 # The End !

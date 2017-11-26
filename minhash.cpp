@@ -10,7 +10,7 @@ CountEstimator::CountEstimator()
 CountEstimator::CountEstimator(int n, long max_prime, int ksize, string input_file_name, 
 	char save_kmers, list<long> *hash_list, bool rev_comp)
 {
-	cout<<"CountEstimator::CountEstimator - Begin"<<endl;
+	// cout<<"CountEstimator::CountEstimator - Begin"<<endl;
 	if(n == 0)
 	{
 		cout<<"n=0 exception\n";
@@ -36,13 +36,12 @@ CountEstimator::CountEstimator(int n, long max_prime, int ksize, string input_fi
 	// initialize the corresponding counts
 	this->_counts.assign(n,0);
 	// initialize the list of kmers used, if appropriate
-	if(save_kmers == 'y')
-	{
+
+	if(save_kmers == 'y') 	{
 		this->_kmers.assign(n,"");
 		this->save_kmers = save_kmers;
 	}
-	else
-	{
+	else 	{
 		this->_kmers.resize(0);
 	}
 	// Initialize file name (if appropriate)
@@ -55,7 +54,7 @@ CountEstimator::CountEstimator(int n, long max_prime, int ksize, string input_fi
 	this->_true_num_kmers = 0;
 	//seed for random number generator
 	srand(time(0));
-	cout<<"CountEstimator::CountEstimator - end"<<endl;
+	// cout<<"CountEstimator::CountEstimator - end"<<endl;
 }
 
 //template <typename T>
@@ -71,24 +70,9 @@ void CountEstimator::down_sample(long h)
 	/* This will down-sample a sketch to have exactly h elements
         :param h: number of elements you wish to save
         :return: None */
-	list<long> temp1 ;
-	list<long> temp2 ;
-	list<string> temp3 ;
-	list<long>::iterator it1 =this->_mins.begin();
-	list<long>::iterator it2 =this->_counts.begin();
-	list<string>::iterator it3 =this->_kmers.begin();
-	for(int i=0; i<h; i++)
-	{
-		temp1.push_back(*it1);
-		it1++;
-		temp2.push_back(*it2);
-		it2++;
-		temp3.push_back(*it3);
-		it3++;
-	}
-	this->_mins = temp1;
-	this->_counts = temp2;
-	this->_kmers = temp3;
+	this->_mins.resize(h);
+	this->_counts.resize(h);
+	this->_kmers.resize(h);
 }
 
 void CountEstimator::add(string kmer, bool rev_comp)
@@ -142,7 +126,6 @@ void CountEstimator::add(string kmer, bool rev_comp)
 	// bisect function
 	long i=0;
 	bool foundIndex = false;
-	#if 1
 	auto it = lower_bound(this->_mins.begin(), this->_mins.end(), h);
 	// if (it != this->_mins.end()) {
 	// 	foundIndex = true;
@@ -190,54 +173,6 @@ void CountEstimator::add(string kmer, bool rev_comp)
 		}
 		return;
 	}
-	#else
-
-	for(list<long>::iterator it =this->_mins.begin(); it!=this->_mins.end(); it++)
-	{
-			if(h==*it)
-			{
-				foundIndex = true;
-				break;
-			}
-			i++;
-	}
-
-
-	list<long>::iterator it4 =this->_mins.begin();
-	list<long>::iterator it5 =this->_counts.begin();
-	list<string>::iterator it6 =this->_kmers.begin();
-
-
-
-	if(foundIndex == true)
-	{
-		cout << "if foundIndex == true" << endl;
-		for(long q=0; q<i;q++)
-		{
-			it4++;
-			it5++;
-			it6++;
-		}
-		(*it4) +=1;
-		return;
-	}
-	else    // otherwise insert h, initialize counts to 1, and insert kmer if necessary
-	{
-		cout << "else foundIndex == true" << endl;
-		_mins.insert(it4, h);
-		_mins.pop_back();
-		_counts.insert(it5, 1);
-		_counts.pop_back();
-		// if(!_kmers.empty())
-		if (this->save_kmers == 'y')
-		{
-			_kmers.insert(it6,kmer);
-			_kmers.pop_back();
-			cout << "_kmers.size() : " << _kmers.size() << endl;
-		}
-		return;
-	}
-	#endif
 	// cout<<"CountEstimator::add - end"<<endl;
 }
 
@@ -254,31 +189,26 @@ void CountEstimator::add_sequence(string seq, bool rev_comp)
 			seq[l] = 'G';
 		}
 	}
-
-	#if 1
 	uint numKmers = seq.length() - this->ksize + 1;
 	for (uint i=0;i < numKmers; i++){
 		add(seq.substr(i, this->ksize), rev_comp);
 	}
-	#else
-	string temp = "                              ";
-	int i=0;
-	while(seq[i+this->ksize-1]!='\0')
-	{
-		for(int j=i;j<(i+this->ksize);j++)
-		{
-			temp[j-i] = seq[j];
-		}
-		add(temp,rev_comp);
-		// cout << temp << "\tlen:" << temp.length() << endl;
-		i++;
-	}
-	#endif
 //	for(list<string>::iterator it =this->_kmers.begin(); it!=this->_kmers.end(); it++)
 //        {
 //		cout<<*it<<endl;
 //	}
 	cout<<"CountEstimator::add_sequence - end"<<endl;
+}
+
+float CountEstimator::jaccard(CountEstimator& other){
+	long truelen = this->_mins.size();
+	auto itr = this->_mins.end();
+	while (truelen > 0 &&  *--itr == this->p){truelen--;};
+	// cout << "truelen : " << truelen << endl;
+	if (truelen == 0){
+		throw "jaccard ValueError";
+	}
+	return (float)this->common(other)/truelen;
 }
 
 //template <typename T>
@@ -293,10 +223,43 @@ void CountEstimator::common_count()
 
 }
 
+long countOverlaps(list<long>& x1, list<long>& x2, long p){
+	auto i = x1.begin(), j = x2.begin();
+	long processed = 0, common = 0;
+	while ( i != x1.end() && j != x2.end()) {
+		// cout << "processed : " << processed << endl;
+		while (*i < *j){
+			i++;
+			if (i == x1.end())
+				break;
+		}
+		while (*i > *j){
+			j++;
+			if (j == x2.end())
+				break;
+		}
+		if (*i == *j){
+			if (*i != p){
+				common++;
+			}
+			i++;
+			j++;
+		}
+		processed++;
+	}
+	// cout << "common : " << common << endl;
+	return common;
+}
 //template <typename T>
-void CountEstimator::common()
-{
-
+long CountEstimator::common(CountEstimator& other){
+	// Calculate number of common k-mers between two sketches.
+	if (this->ksize != other.ksize){
+		throw "different k-mer sizes - cannot compare";
+	}
+	if (this->p != other.p){
+		throw "different primes - cannot compare";
+	}
+	return countOverlaps(this->_mins, other._mins, this->p);
 }
 
 //template <typename T>
@@ -339,7 +302,7 @@ bool is_prime(int number)
 	{
 		return false;
 	}
-	for(int j =3; j<(int(pow(number,0.5))+1); j+=2)
+	for(int j=3; j<(int(pow(number,0.5))+1); j+=2)
 	{
 		if((number%j) == 0)
 		{
@@ -412,15 +375,66 @@ uint64_t MurmurHash64A ( const void * key, int len, unsigned int seed )
 	return h;
 }
 
-#ifdef MINHASH_TEST
+#ifdef _TEST_
+
+void test_jaccard_1(){
+	CountEstimator E1(1, 31, 21, "", 'n', NULL, false);
+	CountEstimator E2(1, 31, 21, "", 'n', NULL, false);
+	list<long> l1 = {1, 2, 3, 4, 5}, l2 = {1, 2, 3, 4, 6};
+	E1._mins = l1;
+	E2._mins = l2;
+	cout << "test_jaccard_1 : " << (E1.jaccard(E2) == (float)4/5) ? true : false;
+	cout << endl;
+	cout << "test_jaccard_1 : " << (E2.jaccard(E1) == (float)4/5) ? true : false;
+	cout << endl;
+}
+
+void test_jaccard_2_difflen(){
+	CountEstimator E1(1, 31, 21, "", 'n', NULL, false);
+	CountEstimator E2(1, 31, 21, "", 'n', NULL, false);
+	list<long> l1 = {1, 2, 3, 4, 5}, l2 = {1, 2, 3, 4};
+	E1._mins = l1;
+	E2._mins = l2;
+	cout << "test_jaccard_1 : " << (E1.jaccard(E2) == (float)4/5) ? true : false;
+	cout << endl;
+	cout << "test_jaccard_1 : " << (E2.jaccard(E1) == (float)4/4) ? true : false;
+	cout << endl;	
+}
+
+void test_yield_overlaps(){
+	list<long> x1 = {1, 3, 5}, x2 = {2, 4, 6};
+	// cout << "x1 size : " << x1.size();
+	cout << "test_yield_overlaps : " << (countOverlaps(x1, x2, 9) == 0) ? true : false ;
+	cout << endl;
+}
+
+void test_yield_overlaps_2(){
+	list<long> x1 = {1, 3, 5}, x2 = {1, 2, 4, 6};
+	cout << "test_yield_overlaps_2 : " << (countOverlaps(x1, x2, 9) == 1) ? true : false ;
+	cout << endl;
+	cout << "test_yield_overlaps_2 : " << (countOverlaps(x2, x1, 9) == 1) ? true : false ;
+	cout << endl;
+}
+void test_yield_overlaps_3(){
+	list<long> x1 = {1, 3, 6}, x2 = {1, 2, 6};
+	cout << "test_yield_overlaps_3 : " << (countOverlaps(x1, x2, 9) == 2) ? true : false ;
+	cout << endl;
+	cout << "test_yield_overlaps_3 : " << (countOverlaps(x2, x1, 9) == 2) ? true : false ;
+	cout << endl;
+}
+
 int main()
 {
 	string p = "CTTGACCTCGTCATTTCACTTTCACTGCGGAGTTTCGGGCAACCGATGGAAA";
     //uint64_t h = MurmurHash64A(p.c_str(),11,11);
     //cout<<"murmur : "<<h<<endl;
     //list<long> hash_list;
-	CountEstimator ch(5000, 9999999999971, 11, "", 'y', NULL, false);
-	ch.add_sequence(p, false);
+	// CountEstimator ch(5000, 9999999999971, 11, "", 'y', NULL, false);
+	// ch.add_sequence(p, false);
+	test_jaccard_1();
+	test_yield_overlaps();
+	test_yield_overlaps_2();
+	test_yield_overlaps_3();
 	return 0;
 }
 #endif

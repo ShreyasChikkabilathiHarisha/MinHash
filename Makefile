@@ -10,17 +10,27 @@ LINKER_OPT       = -L/usr/lib -lstdc++ -lm
 	# $(COMPILER) -std=c++11  -o $@ $@.cpp $(LINKER_OPT)
 
 .PHONY: all
-all : minhash.o basicWorkflow
+all : minhash.o basicworkflow
 
-basicWorkflow: 
+basicworkflow: 
 	$(COMPILER) $(OPTIONS) -o $@ $@.cpp bloom_filter.hpp minhash.o
 
-minhash.o : 
+minhash.o: 
 	$(COMPILER) $(OPTIONS) -c minhash.cpp
+
+containmentminhash.o:
+	$(COMPILER) $(OPTIONS) -std=c++ -c containmentminhash.cpp
+
+minhash:
+	$(COMPILER) $(OPTIONS) -D_TEST_ $@.cpp -o $@
+
+containmentminhash:
+	$(COMPILER) $(OPTIONS) -D_TEST_ $@.cpp -o $@
+
 
 .PHOHY: clean
 clean:
-	rm -f basicWorkflow core *.o *.bak *stackdump *#
+	rm -f minhash containmentminhash basicworkflow core *.o *.bak *stackdump *#
 
 
 #

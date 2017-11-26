@@ -16,7 +16,7 @@ class CountEstimator
 	/* A simple bottom n-sketch MinHash implementation.
     n is the number of sketches to keep
     Still don't know what max_prime is */
-private:
+public:
 	int n;
 	long max_prime = 9999999999971;
 	int ksize = 0;
@@ -39,9 +39,9 @@ public:
 	void add(std::string kmer, bool rev_comp);
 	void add_sequence(std::string seq, bool rev_comp);
 	void jaccard_count();
-	void jaccard();
+	float jaccard(CountEstimator& other);
 	void common_count();
-	void common();
+	long common(CountEstimator& other);
 	void _truncate();
 	void _export();
 	void count_vector();

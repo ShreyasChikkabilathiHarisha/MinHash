@@ -1,0 +1,24 @@
+Shreyas:
+========
+1) Initial code for MinHash
+
+Gopalakrishnan:
+===============
+Midway:
+--------
+1) Prepared demo for midway result (basicworkflow.cpp) - to estimate jaccard index based on containment min hash approach, calculate true jaccard index and figure out relative error.
+Final Demo:
+-----------
+1) Bug fixing on intial code written by Shreyas
+2) Rewrote MinHash code for improving efficiency 
+3) Added required functions in MinHash and unit tested them
+4) Containment MinHash implementation and testing
+5) Implemented basicWorkflow to calculate true jaccard, min hash and containment hash based estimation of jaccard index and relative error
+6) Identified apt bloom filters, murmurhash, hd5 and other libraries and tested their functionalites  
+7) Generated simulated long reads using the same function provided in the containment hash repository
+
+Shreyas:
+========
+
+Atmika:
+=======

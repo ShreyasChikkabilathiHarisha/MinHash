@@ -17,20 +17,6 @@ class CountEstimator
     n is the number of sketches to keep
     Still don't know what max_prime is */
 public:
-	int n;
-	long max_prime = 9999999999971;
-	int ksize = 0;
-	long p;
-	std::string input_file_name = "";
-	char save_kmers = 'n';
-	std::list<long> *hash_list = NULL;
-	bool rev_comp=false;
-	std::list<long> _mins ;
-	std::list<long> _counts ;
-	std::list<std::string> _kmers ;
-	long _true_num_kmers;
-
-public:
 	CountEstimator();
 	CountEstimator(int n, long max_prime, int ksize, std::string input_file_name, 
 				char save_kmers, std::list<long> *hash_list, bool rev_comp);
@@ -47,7 +33,21 @@ public:
 	void count_vector();
 	void jaccard_vector();
 	std::list<std::string>& get_kmers_list(){return _kmers;};
+	long countOverlaps(std::list<long>& x1, std::list<long>& x2, long p);
 
+public:
+	int n;
+	long max_prime = 9999999999971;
+	int ksize = 0;
+	long p;
+	std::string input_file_name = "";
+	char save_kmers = 'n';
+	std::list<long> *hash_list = NULL;
+	bool rev_comp=false;
+	std::list<long> _mins ;
+	std::list<long> _counts ;
+	std::list<std::string> _kmers ;
+	long _true_num_kmers;
 };
 
 uint64_t MurmurHash64A ( const void * key, int len, unsigned int seed );

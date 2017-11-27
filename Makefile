@@ -28,6 +28,11 @@ containmentminhash:
 	$(COMPILER) $(OPTIONS) -D_TEST_ $@.cpp -o $@
 
 
+createVirusesMinHashSketches:
+	$(COMPILER) $(OPTIONS) $@.cpp -o $@ -lstdc++fs -lpthread
+
+
+
 .PHOHY: clean
 clean:
 	rm -f minhash containmentminhash basicworkflow core *.o *.bak *stackdump *#

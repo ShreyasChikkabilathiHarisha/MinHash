@@ -223,7 +223,7 @@ void CountEstimator::common_count()
 
 }
 
-long countOverlaps(list<long>& x1, list<long>& x2, long p){
+long CountEstimator::countOverlaps(list<long>& x1, list<long>& x2, long p){
 	auto i = x1.begin(), j = x2.begin();
 	long processed = 0, common = 0;
 	while ( i != x1.end() && j != x2.end()) {

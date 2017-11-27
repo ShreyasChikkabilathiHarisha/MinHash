@@ -1,6 +1,6 @@
-Shreyas:
-========
-1) Initial code for MinHash
+Atmika:
+=======
+
 
 Gopalakrishnan:
 ===============
@@ -19,6 +19,8 @@ Final Demo:
 
 Shreyas:
 ========
+1) Initial code for MinHash
 
-Atmika:
+
+Sourav:
 =======

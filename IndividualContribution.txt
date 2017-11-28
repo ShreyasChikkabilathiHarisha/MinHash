@@ -16,6 +16,8 @@ Final Demo:
 5) Implemented basicWorkflow to calculate true jaccard, min hash and containment hash based estimation of jaccard index and relative error
 6) Identified apt bloom filters, murmurhash, hd5 and other libraries and tested their functionalites  
 7) Generated simulated long reads using the same function provided in the containment hash repository
+8) Minhash index building in c++ for all virus files - takes about 8 mins (c++) compared to 40 mins (python)
+
 
 Shreyas:
 ========

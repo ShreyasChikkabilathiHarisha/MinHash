@@ -22,7 +22,7 @@ public:
 				char save_kmers, std::list<long> *hash_list, bool rev_comp);
 	void parse_file(bool rev_comp);
 	void down_sample(long h);
-	void add(std::string kmer, bool rev_comp);
+	void add(std::string kmer, bool rev_comp=false);
 	void add_sequence(std::string seq, bool rev_comp);
 	void jaccard_count();
 	float jaccard(CountEstimator& other);
@@ -50,7 +50,16 @@ public:
 	long _true_num_kmers;
 };
 
+
+#define tbl \
+"                                                                "\
+  /*ABCDEFGHIJKLMNOPQRSTUVWXYZ      abcdefghijklmnopqrstuvwxyz    */\
+" TVGH FCD  M KN   YSAABW R       TVGH FCD  M KN   YSAABW R"
+  //" TVGH FCD  M KA   YSAABWARA      TVGH FCD  M KA   YSAABWARA"
+
+std::string _revcomp(const std::string& kmer);
+
+
 uint64_t MurmurHash64A ( const void * key, int len, unsigned int seed );
 bool is_prime(int number);
 long get_prime_lt_x(long t);
-//int main();

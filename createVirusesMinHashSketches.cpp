@@ -16,101 +16,154 @@
 #include <linux/limits.h>
 #include <experimental/filesystem>
 #include <unordered_set>
+#include <mutex>
 
 #include "minhash.hpp"
 
 using namespace std;
 namespace fs = std::experimental::filesystem;
 
-unsigned int num_threads = thread::hardware_concurrency();
+unsigned int num_cores = thread::hardware_concurrency();
 long long prime = 9999999999971; // taking hashes mod this prime
 unsigned int ksize = 21;  // k-mer length
 unsigned int max_h = 500;  // max number of hashes in sketch
 list<string> file_names; 
+unsigned int testCount = 0;
+mutex listMutex;
+mutex minhashMutex;
+list<CountEstimator> MHS;
 
 // string filename = "/fatfs/Fall2017Courses/ComputationalBiology/project/MinHashMetagenomics-master/data/Viruses/FileNames.txt";
 string relativePath = "/../../../MinHashMetagenomics-master/data/Viruses/";
 string filename = "FileNames.txt";
 
-list<CountEstimator> make_minhash(string aFilepath, unsigned int amax_h, unsigned int prime, unsigned int ksize){
-	unordered_set<string> kmers;
-	
 
+void generateKmersAddtoCE(CountEstimator& MHS, unordered_set<string>& kmers, string& seq, unsigned int aksize, string& agenome){
+	for (int i = 0; i < seq.size()-aksize+1; i++){
+		string kmer = seq.substr(i, aksize);
+		string kmer_rev = _revcomp(kmer);
+		// cout << "kmer : " << kmer;
+		// cout << "\nkmer_rev: " << kmer_rev;
+		if (kmer < kmer_rev){
+			kmers.insert(kmer);
+			MHS.add(kmer);
+			// cout << "\n--------kmer--------\n";	
+		}else{
+			kmers.insert(kmer_rev);
+			MHS.add(kmer_rev);
+			// cout << "\n--------kmer_rev--------\n";
+		}
+		
+	}
+	MHS._true_num_kmers = kmers.size();
+	MHS.input_file_name = fs::path(agenome).filename().string();
+	// cout << "kmers.size : " << kmers.size() << "\n";
+}
+
+void make_minhash(string& agenome, unsigned int amax_h, unsigned int aprime, unsigned int aksize){
+	unordered_set<string> kmers;
+	CountEstimator MHS(amax_h, aprime, aksize, "", 'y', NULL, false);
+	
+	std::ifstream input(agenome);
+	if(!input.good()){
+		std::cerr << "Error opening '"<<agenome<<"'. Bailing out." << std::endl;
+		return;
+	}
+	std::string line, name, content;
+	while( std::getline( input, line ).good() ){
+        if( line.empty() || line[0] == '>' ){ // Identifier marker
+            if( !name.empty() ){ // Print out what we read from the last entry
+            	// std::cout << "intermediate : " << name << " : " << content.size() << std::endl;
+            	// TODO : need to see if we need to handle the case 
+            	generateKmersAddtoCE(MHS, kmers, content, aksize, agenome);
+            	name.clear();
+            }
+            if( !line.empty() ){
+            	name = line.substr(1);
+            }
+            content.clear();
+        } else if( !name.empty() ){
+            if( line.find(' ') != std::string::npos ){ // Invalid sequence--no spaces allowed
+            	name.clear();
+            	content.clear();
+            } else {
+            	content += line;
+            }
+        }
+    }
+    if( !name.empty() ){ // Print out what we read from the last entry
+    	// std::cout << "last : " << name << " : " << content.size() << std::endl;
+    }
+
+    generateKmersAddtoCE(MHS, kmers, content, aksize, agenome);
+
+    ofstream fos;
+    fos.open("data/Viruses/" + fs::path(agenome).filename().string() + ".Hash21mers.fa" );
+    // cout << "open : " << "data/Viruses/"+fs::path(agenome).filename().string() + ".Hash21mers.fa" << endl;
+    for (auto& kmer: MHS._kmers){
+    	fos << ">\n" << kmer << "\n";
+    }
+    fos.close();
+    // cout << "close" << endl;
+
+	// minhashMutex.lock();
+	// testCount++ ;
+	// minhashMutex.unlock();
 } 
 
-void threadFunc(const string& filename){
-	cout << this_thread::get_id() << " filename : " << filename << "\n";
-}
-void createThread(const string& filename){
-	thread t1(threadFunc, filename);
-	t1.detach();
+// thread will take a file and process it
+void threadFunc(list<string>& aFilenames){
+	listMutex.lock();
+	while(!aFilenames.empty()){
+		string curFile = aFilenames.front();
+		// cout << this_thread::get_id() << " filename : " << aFilenames.front() << "\n";
+		aFilenames.pop_front();
+		listMutex.unlock();
+		// do all the processing here
+		make_minhash(curFile, max_h, prime, ksize);
+		listMutex.lock();
+	}
+	listMutex.unlock();
 }
 
+void createThreads(unsigned int aNumThreads, list<string>& aFilenames){
+	vector<thread> thrdVect; // twice to avoid wasting time in thread creation
+	for (auto i=0; i < aNumThreads*2; i++){
+		thrdVect.push_back(thread(threadFunc,std::ref(aFilenames)));
+	}
+	for (auto& thrd: thrdVect){
+		thrd.join();
+		// cout << "thread joined : " << thrd.get_id() << "\n";
+	}
+	cout << "aFilenames.size() : " << aFilenames.size() << "\n";
+	// for(auto& f: aFilenames){
+	// 	cout << f << "\n";
+	// }
+}
+
+
 int main(){
-	ifstream fs;
+	ifstream fis;
 	string line;
-    fs::path p = fs::current_path();
-    string absPath = p.string() + relativePath + filename; 
+	fs::path p = fs::current_path();
+	string absPath = p.string() + relativePath + filename; 
 	cout << absPath << "\n";
-	fs.open(absPath);
-	if (fs.is_open()) {
-		while ( getline (fs,line) ) {
+	fis.open(absPath);
+	if (fis.is_open()) {
+		while ( getline (fis,line) ) {
 			// cout << fs::path(line).filename().string() << "\n";
 			file_names.push_back(fs::path(line).string());
 		}
 	}else {
 		cout << "Unable to open file\n";
 	}
-	fs.close();
-
-	
-	cout << *file_names.begin() << "\n";
+	fis.close();
+	// cout << *file_names.begin() << "\n";
 	// for_each(file_names.begin(), file_names.end(), [](string &filename){cout << filename << "\n";});
-	for_each(file_names.begin(), file_names.end(), createThread);
-	
-	// t1.detach();
-	//t1.join();
-
+	// cout << "numfiles : " << file_names.size() << "\n";
+	// for_each(file_names.begin(), file_names.end(), createThread);
+	createThreads(num_cores, file_names);
+	cout << "testCount : " << testCount ;
 	cout << endl;
 	return 0;
 }
-
-
-/*
-
-
-def make_minhash(genome, max_h, prime, ksize):
-	kmers = set()
-	name = os.path.basename(genome)
-	MHS = MH.CountEstimator(n=max_h, max_prime=prime, ksize=ksize, save_kmers='y')
-	for record in screed.open(genome):
-		seq = record.sequence
-		for i in range(len(seq) - ksize + 1):
-			kmer = seq[i:i+ksize]
-			kmer_rev = khmer.reverse_complement(kmer)
-			if kmer < kmer_rev:
-				kmers.add(kmer)
-				MHS.add(kmer)
-			else:
-				kmers.add(kmer_rev)
-				MHS.add(kmer_rev)
-	MHS._true_num_kmers = len(kmers)
-	MHS.input_file_name = os.path.basename(genome)
-	# Export the hash k-mers
-	fid = open(os.path.abspath(os.path.join('../data/Viruses/', name + ".Hash21mers.fa")), 'w')
-	for kmer in MHS._kmers:
-		fid.write(">\n%s\n" % kmer)
-	fid.close()
-
-
-def make_minhash_star(arg):
-return make_minhash(*arg)
-
-pool = Pool(processes=num_threads)
-genome_sketches = pool.map(make_minhash_star, zip(file_names, repeat(max_h), repeat(prime), repeat(ksize)))
-
-
-# Export all the sketches
-base_names = [os.path.basename(item) for item in file_names]
-MH.export_multiple_to_single_hdf5(genome_sketches, os.path.abspath('../data/Viruses/AllSketches.h5'))
-*/

@@ -1,7 +1,7 @@
 COMPILER         = -g++
 # COMPILER        = -clang
 OPTIMIZATION_OPT = -O3
-# OPTIONS          = -pedantic-errors -ansi -Wall -Wextra -Werror -Wno-long-long $(OPTIMIZATION_OPT) -std=c++11
+# OPTIONS          = -pedantic-errors -ansi -Wall -Wextra -Werror -Wno-long-long $(OPTIMIZATION_OPT) -std=c++17
 LINKER_OPT       = -L/usr/lib -lstdc++ -lm
 
 # BUILD_LIST+=basicWorkflow
@@ -10,7 +10,7 @@ LINKER_OPT       = -L/usr/lib -lstdc++ -lm
 	# $(COMPILER) -std=c++11  -o $@ $@.cpp $(LINKER_OPT)
 
 .PHONY: all
-all : minhash.o basicworkflow
+all : minhash.o basicworkflow createVirusesMinHashSketches
 
 basicworkflow: 
 	$(COMPILER) $(OPTIONS) -o $@ $@.cpp bloom_filter.hpp minhash.o
@@ -29,13 +29,12 @@ containmentminhash:
 
 
 createVirusesMinHashSketches:
-	$(COMPILER) $(OPTIONS) $@.cpp -o $@ -lstdc++fs -lpthread
-
+	$(COMPILER) $(OPTIONS) $@.cpp minhash.o -o $@ -lstdc++fs -lpthread
 
 
 .PHOHY: clean
 clean:
-	rm -f minhash containmentminhash basicworkflow core *.o *.bak *stackdump *#
+	rm -f basicworkflow minhash containmentminhash createVirusesMinHashSketches core *.o
 
 
 #

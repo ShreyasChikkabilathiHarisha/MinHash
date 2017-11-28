@@ -137,7 +137,7 @@ void CountEstimator::add(string kmer, bool rev_comp)
 	if (*it == h ){
 		auto itrCounts = this->_counts.begin();
 		advance(itrCounts, i);
-		cout << "*itrCounts : " << *itrCounts << "\n" ;
+		//cout << "*itrCounts : " << *itrCounts << "\n" ;
 		*itrCounts += 1;
 		return;
 	} 
@@ -374,6 +374,23 @@ uint64_t MurmurHash64A ( const void * key, int len, unsigned int seed )
 	h ^= h >> r;
 	return h;
 }
+
+std::string _revcomp(const std::string& kmer)
+{
+	std::string out = kmer;
+
+	auto from = out.begin();
+	auto to = out.end();
+
+	char c;
+	for (to--; from <= to; from++, to--) {
+		c = tbl[(int)*from];
+		*from = tbl[(int)*to];
+		*to = c;
+	}
+	return out;
+}
+
 
 #ifdef _TEST_
 

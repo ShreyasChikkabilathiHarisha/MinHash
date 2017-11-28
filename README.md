@@ -7,9 +7,13 @@ TO DO's
 =======
 write a fastq reader from code in createVirusesMinHashSketches.cpp - populate all kmers in a list/vector.. pass one kmer to caller on each call.
 
-write code for import, export to hdf5 files in minhash.cpp 
+write code for import, export to hdf5 files in minhash.cpp. Is this required?
 
-add code to dump minhash sketches to hdf5 file in createVirusesMinHashSketches.cpp
+add code to dump minhash sketches to hdf5 file in createVirusesMinHashSketches.cpp, is this required?
+
+Professor asked us to use this for fastq reader:
+https://github.com/attractivechaos/klib/blob/master/kseq.h
+
 
 some observations:
 ==================

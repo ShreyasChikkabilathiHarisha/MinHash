@@ -22,6 +22,7 @@ Final Demo:
 Shreyas:
 ========
 1) Initial code for MinHash
+2) Initial mapper.c 
 
 
 Sourav:

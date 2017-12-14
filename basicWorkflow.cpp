@@ -123,7 +123,9 @@ int main()
    CountEstimator ch(10, 9999999999971, 11, "", 'y', NULL, false);
    ch.add_sequence(small_string, false);
    //cout << "hashList Size : " << hash_list.size() << endl;
-
+   CountEstimator ch1(10, 9999999999971, 11, "", 'y', NULL, false);
+   ch1.add_sequence(large_string, false);
+   float min_jac = ch1.jaccard(ch);
 
 
    bloom_parameters parameters;
@@ -184,18 +186,20 @@ int main()
    cout << "int_est : " << int_est << endl;
    int_est -= h * prob_error_rate;
    cout << "int_est (after adjustment): " << int_est << endl;
-   float containment_est, jaccard_est;
+   float containment_est, jaccard_est, minhash_est, jaccard_est_minhash;
    containment_est = int_est /(float) h;
    // need not divide by h now, but need to modify after min hash implementation
    //containment_est = int_est ;
 
    jaccard_est = size_A * containment_est / (size_A + size_B_est - size_A * containment_est);
-
+   jaccard_est_minhash = size_A * min_jac / (size_A + size_B_est - size_A * min_jac );
+   cout << "Minhash index estimate: " << min_jac << endl;
    cout << "Containment index estimate: " << containment_est << endl;
    cout << "Jaccard index estimate (via the containment approach): " << jaccard_est << endl;
+   cout << "Jaccard index estimate (via the Minhash  approach): " << jaccard_est_minhash << endl;
    cout << "True Jaccard index: " << true_jaccard << endl;
-   cout << "Relative error: " << abs(jaccard_est-true_jaccard) / true_jaccard << endl;
-
+   cout << "Relative error through containment approach: " << abs(jaccard_est-true_jaccard) / true_jaccard << endl;
+   cout << "Relative error through minhash approach: " << abs(jaccard_est_minhash-true_jaccard) / true_jaccard << endl;
 
    delete kmersB;
    delete kmersA;

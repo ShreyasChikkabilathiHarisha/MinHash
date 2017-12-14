@@ -100,6 +100,11 @@ int main()
    vector<float> *min_jaccards = new vector<float>;
    CountEstimator ch(10, 9999999999971, 11, "", 'y', NULL, false);
    ch.add_sequence(small_string, false);
+   vector<string> *kmersB = new vector<string>;
+   string ek;
+   while(getline("kmers.txt"),line){
+     kmersB.push_back(line);
+   }
    CountEstimator re();
    string line;
    while(getline("data.txt"),line){

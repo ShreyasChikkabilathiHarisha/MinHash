@@ -21,8 +21,11 @@ Final Demo:
 
 Shreyas:
 ========
-1) Initial code for MinHash
-2) Initial mapper.c 
+1) Code for MinHash
+2) Mapper.c
+3) minhash calculation in the basickWorkflow.cpp file.
+4) code cleanup
+5) instructions
 
 
 Sourav:

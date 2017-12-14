@@ -18,13 +18,15 @@ Final Demo:
 7) Generated simulated long reads using the same python code provided in the containment hash repository to be used for comparing results after all working C++ code is ready.( Considerable work was required to install all required tools and setting up the environment).
 8) Code to generate min hash sketches for all virus files. (createminhashvirussketches.cpp) and compared the execution time in python and c++ code.
 
-Shreyas:
+Shreyas Harisha:
 ========
-1) Code for MinHash
-2) Mapper.c
-3) minhash calculation in the basickWorkflow.cpp file.
-4) code cleanup
-5) instructions
+(Combining both midway and final phases into one place:)
+1) Wrote the code for MinHash in Minhash.cpp.
+2) Wrote the code for Mapper in Mapper.cpp
+3) Wrote the Minhash calculation in basickWorkflow.cpp to calculate minhash based estimation of jaccard index and listing out relative error for minhash.
+4) Did final code cleanup.
+5) Wrote the instructions and requirements for the system setup, explaining basic flow of execution.
+6) Worked on storing the Minhashes and kmers of the virus genomes in the createminhashvirussketches.cpp into files for future use in the project (used later in mapper for querrying the data against new virus genome sequence).
 
 
 Sourav:

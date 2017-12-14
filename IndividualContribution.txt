@@ -16,7 +16,7 @@ Final Demo:
 5) Implemented basicWorkflow to calculate true jaccard index, min hash and containment hash based estimation of jaccard index and listing out relative errors.
 6) Identified/Wrote suitable fastq reader, bloom filters, murmurhash, hd5 and other tools/libraries and tested their functionalites.
 7) Generated simulated long reads using the same python code provided in the containment hash repository to be used for comparing results after all working C++ code is ready.( Considerable work was required to install all required tools and setting up the environment).
-
+8) Code to generate min hash sketches for all virus files. (createminhashvirussketches.cpp) and compared the execution time in python and c++ code.
 
 Shreyas:
 ========

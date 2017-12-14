@@ -89,38 +89,58 @@ int main()
    }
    float minestimate = re.jaccard(ch);
 
-   ContainmentMinHash cmh(small_string.length(), prob_error_rate, 0xA5A5A5A5);
+   bloom_parameters parameters;
+   // How many elements roughly do we expect to insert?
+   parameters.projected_element_count = 1.15*large_string.length();
+   // Maximum tolerable false positive probability? (0,1)
+   parameters.false_positive_probability = prob_error_rate; // 1 in 100
+   // Simple randomizer (optional)
+   parameters.random_seed = 0xA5A5A5A5;
+
+   parameters.compute_optimal_parameters();
+   //Instantiate Bloom Filter
+   bloom_filter filter(parameters);
+
+   // Insert kmers into Bloom Filter
    for (size_t i = 0; i < size_B; ++i)
    {
-      if (!cmh.contains(kmersA->at(i))){
-         cmh.add(kmersA->at(i));
-         size_A_est++;
+      if (!filter.contains(kmersB->at(i))){
+         filter.insert(kmersB->at(i));
+         size_B_est++;
       }
       else{
-         cout << "string already present in bloom_filter : " << kmersA->at(i) << endl;
+         cout << "string already present in bloom_filter : " << kmersB->at(i) << endl;
       }
    }
-   long i=0;
-   vector<float> *con_jaccards = new vector<float>;
-   float containment_est_jaccard;
-   for(list<CountEstimator>::iterator it = genome_sketches.begin(); it!= genome_sketches.end(); it++)
+   cout << "size_B_est :" << size_B_est << endl;
+   float int_est = 0;
+
+   for (size_t i = 0; i < size_A; ++i)
    {
-      cout << "element count :" << cmh.element_count() << "\n";
-      float int_est = 0;
-      for (auto& kmer : ch.get_kmers_list()){
-         if (!kmer.empty() && cmh.contains(kmer)){
-            int_est++;
-         }
-         else{
-            cout << "BF doesnot contain " << kmer << endl;
-         }
+      if (filter.contains(kmersA->at(i)))
+      {
+         int_est++;
+            //cout << "BF contains: " << kmersA->at(i) << endl;
       }
-      cout << "MinHash" << minestimate << endl;
-      containment_est = int_est / float(h)
-      containment_est_jaccard = ((*it)->_true_num_kmers * containment_est)/((*it)->_true_num_kmers + kmersA.size() - ((*it)->_true_num_kmers * containment_est));
-      con_jaccards.push_back(containment_est_jaccard);
-      i++;
+      else{
+         cout << "BF doesnot contain" << kmersA->at(i) << endl;
+      }
    }
+
+   cout << "int_est : " << int_est << endl;
+   int_est -= h * prob_error_rate;
+   cout << "int_est (after adjustment): " << int_est << endl;
+   float containment_est, jaccard_est, minhash_est, jaccard_est_minhash;
+   containment_est = int_est /(float) h;
+   jaccard_est = size_A * containment_est / (size_A + size_B_est - size_A * containment_est);
+   jaccard_est_minhash = size_A * minestimate / (size_A + size_B_est - size_A * minestimate );
+   cout << "Minhash index estimate: " << minestimate << endl;
+   cout << "Containment index estimate: " << containment_est << endl;
+   cout << "Jaccard index estimate (via the containment approach): " << jaccard_est << endl;
+   cout << "Jaccard index estimate (via the Minhash  approach): " << jaccard_est_minhash << endl;
+
+
+   cout << "MinHash" << minestimate << endl;
 
    // to wrote the mean of min and containment hashes between the sample and the values in the hdf5 exports.
 

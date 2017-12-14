@@ -1,8 +1,8 @@
 #include <iostream>
 #include <string>
-#include <algorithm>  
+#include <algorithm>
 #include <vector>
-
+#include <fstream>
 #include "minhash.hpp"
 // #include "bloom_filter.hpp"
 #include "containmentminhash.cpp"
@@ -88,7 +88,7 @@ int main()
    // Kmer size
    const uint ksize = 11;
    // probability error rate for bloom filter
-   const float prob_error_rate = 0.01; 
+   const float prob_error_rate = 0.01;
    // max number of hashes to retain for each string
    const uint h = 10;
    // num kmers formed from each string
@@ -100,14 +100,12 @@ int main()
    vector<float> *min_jaccards = new vector<float>;
    CountEstimator ch(10, 9999999999971, 11, "", 'y', NULL, false);
    ch.add_sequence(small_string, false);
-   list<CountEstimator> genome_sketches;
-   genome_sketches = import_multiple_from_single_hdf5(../data/Genomes/AllSketches.h5'), base_names));
-   for(list<CountEstimator>::iterator it = genome_sketches.begin(); it!= genome_sketches.end(); it++)
-   {
-      (*it)->down_sample(h);
-      float min_jaccard = (*it).jaccard(ch);
-      min_jaccards.push_back(min_jaccard);
+   CountEstimator re();
+   string line;
+   while(getline("data.txt"),line){
+     re._mins.insert(line);
    }
+   re.jaccard(re._mins);
 
    ContainmentMinHash cmh(small_string.length(), prob_error_rate, 0xA5A5A5A5);
    for (size_t i = 0; i < size_B; ++i)

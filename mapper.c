@@ -19,20 +19,7 @@ float trueJaccards(vector<string> *aKmerVectB, vector<string> *aKmerVectA) {
 
    sort(aKmerVectB->begin(), aKmerVectB->end());
    sort(aKmerVectA->begin(), aKmerVectA->end());
-   /*
-   cout << "sort A:" << endl;
-   for(std::vector<std::string>::iterator i = aKmerVectA->begin(); i != aKmerVectA->end(); ++i)
-   {
-     cout << *i << ' ';
-   }
-   cout << endl;
-   cout << "sort B:" << endl;
-   for(std::vector<std::string>::iterator i = aKmerVectB->begin(); i != aKmerVectB->end(); ++i)
-   {
-     cout << *i << ' ';
-   }
-   cout << endl;
-   */
+
    // bigger set has to go as first argument
    itEnd=std::set_intersection(aKmerVectB->begin(), aKmerVectB->end(), aKmerVectA->begin(), aKmerVectA->end(), v->begin(), KmerCompare);
    uint countIntersect = 0;
@@ -40,26 +27,16 @@ float trueJaccards(vector<string> *aKmerVectB, vector<string> *aKmerVectA) {
       countIntersect = itEnd-v->begin();
    }
    std::cout << "The intersection has " << countIntersect << " elements:\n";
-   /*
-   for (it=v->begin(); it!=itEnd; ++it){
-      cout << ' ' << *it;
-   }
-   std::cout << '\n';
-   */
+
    itEnd=std::set_union(aKmerVectB->begin(), aKmerVectB->end(), aKmerVectA->begin(), aKmerVectA->end(), v->begin(), KmerCompare);
    uint countUnion = 0;
    if (itEnd-v->begin() > 0){
       countUnion = itEnd-v->begin();
    }
    std::cout << "The union has " << countUnion << " elements:\n";
-   /*
-   for (it=v->begin(); it!=itEnd; ++it){
-      cout << ' ' << *it;
-   }
-   std::cout << '\n';
-   */
+
    float trueJaccard = countIntersect / (float)countUnion;
-   //cout << "trueJaccard : " << trueJaccard << endl;
+
    delete v;
    return trueJaccard;
 }
@@ -67,7 +44,7 @@ float trueJaccards(vector<string> *aKmerVectB, vector<string> *aKmerVectA) {
 void generateKmers(string &aLargeString, const uint &aKmerSize, vector<string> *aKmerVect, const uint numKmers){
    vector<string>::iterator it = aKmerVect->begin();
    for (uint i=0;i < numKmers; i++){
-      //cout << i << " : " << aLargeString.substr(i, aKmerSize) << endl;
+
       aKmerVect->insert(it, aLargeString.substr(i, aKmerSize));
       it++;
    }
@@ -102,12 +79,12 @@ int main()
    ch.add_sequence(small_string, false);
    vector<string> *kmersB = new vector<string>;
    string ek;
-   while(getline("kmers.txt"),line){
+   while(getline("kmer_list.txt"),line){
      kmersB.push_back(line);
    }
    CountEstimator re();
    string line;
-   while(getline("data.txt"),line){
+   while(getline("minhash.txt"),line){
      re._mins.insert(line);
    }
    float minestimate = re.jaccard(ch);

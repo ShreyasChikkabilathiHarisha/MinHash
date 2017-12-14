@@ -9,7 +9,6 @@ using namespace std;
 void generateKmers(string &aLargeString, const unsigned int &aKmerSize, vector<string> *aKmerVect, const unsigned int numKmers){
    vector<string>::iterator it = aKmerVect->begin();
    for (int i=0;i < numKmers; i++){
-      //cout << i << " : " << aLargeString.substr(i, aKmerSize) << endl;
       aKmerVect->insert(it, aLargeString.substr(i, aKmerSize));
       it++;
    }
@@ -35,20 +34,7 @@ unsigned int trueJaccards(vector<string> *aKmerVectB, vector<string> *aKmerVectA
 
    sort(aKmerVectB->begin(), aKmerVectB->end());
    sort(aKmerVectA->begin(), aKmerVectA->end());
-   /*
-   cout << "sort A:" << endl;
-   for(std::vector<std::string>::iterator i = aKmerVectA->begin(); i != aKmerVectA->end(); ++i)
-   {
-     cout << *i << ' ';
-   }
-   cout << endl;
-   cout << "sort B:" << endl;
-   for(std::vector<std::string>::iterator i = aKmerVectB->begin(); i != aKmerVectB->end(); ++i)
-   {
-     cout << *i << ' ';
-   }
-   cout << endl;
-   */
+
    // bigger set has to go as first argument
    itEnd=std::set_intersection(aKmerVectB->begin(), aKmerVectB->end(), aKmerVectA->begin(), aKmerVectA->end(), v->begin(), KmerCompare);
    unsigned int countIntersect = 0;
@@ -56,24 +42,14 @@ unsigned int trueJaccards(vector<string> *aKmerVectB, vector<string> *aKmerVectA
       countIntersect = itEnd-v->begin();
    }
    std::cout << "The intersection has " << countIntersect << " elements:\n";
-   /*
-   for (it=v->begin(); it!=itEnd; ++it){
-      cout << ' ' << *it;
-   }
-   std::cout << '\n';
-   */
+
    itEnd=std::set_union(aKmerVectB->begin(), aKmerVectB->end(), aKmerVectA->begin(), aKmerVectA->end(), v->begin(), KmerCompare);
    unsigned int countUnion = 0;
    if (itEnd-v->begin() > 0){
       countUnion = itEnd-v->begin();
    }
    std::cout << "The union has " << countUnion << " elements:\n";
-   /*
-   for (it=v->begin(); it!=itEnd; ++it){
-      cout << ' ' << *it;
-   }
-   std::cout << '\n';
-   */
+
    float trueJaccard = countIntersect / (float)countUnion;
    cout << "trueJaccard : " << trueJaccard << endl;
    delete v;

@@ -22,7 +22,6 @@ private:
 
 ContainmentMinHash::ContainmentMinHash(unsigned long long int aElementCount, double aFalsePostProb, unsigned long long int aRndSeed){
 	bloom_parameters parameters;
-	// TODO: 1.15 multiple, correct?
 	parameters.projected_element_count = 1.15*aElementCount;
 	parameters.false_positive_probability = aFalsePostProb; // 1 in 100
 	parameters.random_seed = aRndSeed;

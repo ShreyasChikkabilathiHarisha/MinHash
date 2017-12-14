@@ -17,7 +17,6 @@ void read_directory(const std::string& name, stringvec& v)
 
 void sim(int num_genomes, int reads){
   std::vector<std::string> files;
-//leaving some space for dealing with files
 
 std::vector<int> vecOfRandomNums(num_genomes - 1);
 std::generate(vecOfRandomNums.begin(), vecOfRandomNums.end(), []() {

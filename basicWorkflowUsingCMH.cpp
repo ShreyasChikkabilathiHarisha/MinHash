@@ -37,20 +37,7 @@ float trueJaccards(vector<string> *aKmerVectB, vector<string> *aKmerVectA) {
 
    sort(aKmerVectB->begin(), aKmerVectB->end());
    sort(aKmerVectA->begin(), aKmerVectA->end());
-   /*
-   cout << "sort A:" << endl;
-   for(std::vector<std::string>::iterator i = aKmerVectA->begin(); i != aKmerVectA->end(); ++i)
-   {
-     cout << *i << ' ';
-   }
-   cout << endl;
-   cout << "sort B:" << endl;
-   for(std::vector<std::string>::iterator i = aKmerVectB->begin(); i != aKmerVectB->end(); ++i)
-   {
-     cout << *i << ' ';
-   }
-   cout << endl;
-   */
+
    // bigger set has to go as first argument
    itEnd=std::set_intersection(aKmerVectB->begin(), aKmerVectB->end(), aKmerVectA->begin(), aKmerVectA->end(), v->begin(), KmerCompare);
    uint countIntersect = 0;
@@ -58,24 +45,14 @@ float trueJaccards(vector<string> *aKmerVectB, vector<string> *aKmerVectA) {
       countIntersect = itEnd-v->begin();
    }
    std::cout << "The intersection has " << countIntersect << " elements:\n";
-   /*
-   for (it=v->begin(); it!=itEnd; ++it){
-      cout << ' ' << *it;
-   }
-   std::cout << '\n';
-   */
+
    itEnd=std::set_union(aKmerVectB->begin(), aKmerVectB->end(), aKmerVectA->begin(), aKmerVectA->end(), v->begin(), KmerCompare);
    uint countUnion = 0;
    if (itEnd-v->begin() > 0){
       countUnion = itEnd-v->begin();
    }
    std::cout << "The union has " << countUnion << " elements:\n";
-   /*
-   for (it=v->begin(); it!=itEnd; ++it){
-      cout << ' ' << *it;
-   }
-   std::cout << '\n';
-   */
+
    float trueJaccard = countIntersect / (float)countUnion;
    //cout << "trueJaccard : " << trueJaccard << endl;
    delete v;
@@ -208,14 +185,12 @@ int main()
    }
    #endif
 #endif
-   // we divide intersection estimate by h until we get minhash working.
    //int_est = int_est / h;
    cout << "int_est : " << int_est << endl;
    int_est -= h * prob_error_rate;
    cout << "int_est (after adjustment): " << int_est << endl;
    float containment_est, jaccard_est;
    containment_est = int_est /(float) h;
-   // need not divide by h now, but need to modify after min hash implementation
    //containment_est = int_est ;
 
    jaccard_est = size_A * containment_est / (size_A + size_B_est - size_A * containment_est);

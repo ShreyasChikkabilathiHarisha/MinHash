@@ -72,9 +72,7 @@ void make_minhash(string& agenome, unsigned int amax_h, unsigned int aprime, uns
 	std::string line, name, content;
 	while( std::getline( input, line ).good() ){
         if( line.empty() || line[0] == '>' ){ // Identifier marker
-            if( !name.empty() ){ // Print out what we read from the last entry
-            	// std::cout << "intermediate : " << name << " : " << content.size() << std::endl;
-            	// TODO : need to see if we need to handle the case 
+            if( !name.empty() ){
             	generateKmersAddtoCE(MHS, kmers, content, aksize, agenome);
             	name.clear();
             }
@@ -98,12 +96,19 @@ void make_minhash(string& agenome, unsigned int amax_h, unsigned int aprime, uns
     generateKmersAddtoCE(MHS, kmers, content, aksize, agenome);
 
     ofstream fos;
-    fos.open("data/Viruses/" + fs::path(agenome).filename().string() + ".Hash21mers.fa" );
+//    fos.open("data/Viruses/" + fs::path(agenome).filename().string() + ".Hash21mers.fa" );
     // cout << "open : " << "data/Viruses/"+fs::path(agenome).filename().string() + ".Hash21mers.fa" << endl;
+    fos.open("minhash_list.txt");
     for (auto& mins: MHS._mins){
     	fos << ">\n" << mins << "\n";
     }
     fos.close();
+    fos.open("kmer_list.txt");
+    for (auto& kmers: MHS._kmers){
+        fos << ">\n" << kmers << "\n";
+    }
+    fos.close();
+
     // cout << "close" << endl;
 
 	// minhashMutex.lock();

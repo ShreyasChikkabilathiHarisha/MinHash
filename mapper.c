@@ -105,7 +105,7 @@ int main()
    while(getline("data.txt"),line){
      re._mins.insert(line);
    }
-   re.jaccard(re._mins);
+   re.jaccard(ch);
 
    ContainmentMinHash cmh(small_string.length(), prob_error_rate, 0xA5A5A5A5);
    for (size_t i = 0; i < size_B; ++i)

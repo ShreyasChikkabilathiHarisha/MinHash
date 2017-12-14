@@ -105,7 +105,7 @@ int main()
    while(getline("data.txt"),line){
      re._mins.insert(line);
    }
-   re.jaccard(re._mins);
+   float minestimate = re.jaccard(ch);
 
    ContainmentMinHash cmh(small_string.length(), prob_error_rate, 0xA5A5A5A5);
    for (size_t i = 0; i < size_B; ++i)
@@ -133,7 +133,7 @@ int main()
             cout << "BF doesnot contain " << kmer << endl;
          }
       }
-
+      cout << "MinHash" << minestimate << endl;
       containment_est = int_est / float(h)
       containment_est_jaccard = ((*it)->_true_num_kmers * containment_est)/((*it)->_true_num_kmers + kmersA.size() - ((*it)->_true_num_kmers * containment_est));
       con_jaccards.push_back(containment_est_jaccard);

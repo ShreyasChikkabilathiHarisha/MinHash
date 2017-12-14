@@ -13,7 +13,7 @@
 #include <string>
 #include <thread>
 #include <list>
-#include <linux/limits.h>
+#include "linux/limits.h"
 #include <experimental/filesystem>
 #include <unordered_set>
 #include <mutex>
@@ -100,8 +100,8 @@ void make_minhash(string& agenome, unsigned int amax_h, unsigned int aprime, uns
     ofstream fos;
     fos.open("data/Viruses/" + fs::path(agenome).filename().string() + ".Hash21mers.fa" );
     // cout << "open : " << "data/Viruses/"+fs::path(agenome).filename().string() + ".Hash21mers.fa" << endl;
-    for (auto& kmer: MHS._kmers){
-    	fos << ">\n" << kmer << "\n";
+    for (auto& mins: MHS._mins){
+    	fos << ">\n" << mins << "\n";
     }
     fos.close();
     // cout << "close" << endl;

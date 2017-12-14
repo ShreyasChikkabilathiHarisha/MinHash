@@ -1,5 +1,6 @@
 #include "minhash.hpp"
 
+
 using namespace std;
 
 CountEstimator::CountEstimator()
@@ -7,7 +8,7 @@ CountEstimator::CountEstimator()
 	cout<<"CountEstimator::CountEstimator - Default"<<endl;
 }
 
-CountEstimator::CountEstimator(int n, long max_prime, int ksize, string input_file_name, 
+CountEstimator::CountEstimator(int n, long max_prime, int ksize, string input_file_name,
 	char save_kmers, list<long> *hash_list, bool rev_comp)
 {
 	// cout<<"CountEstimator::CountEstimator - Begin"<<endl;
@@ -120,7 +121,7 @@ void CountEstimator::add(string kmer, bool rev_comp)
 	}
 	if(h>=*(--_mins.end()))
 	{
-		// cout << "h>=*(_mins.end())" << endl; 
+		// cout << "h>=*(_mins.end())" << endl;
 		return;
 	}
 	// bisect function
@@ -140,10 +141,10 @@ void CountEstimator::add(string kmer, bool rev_comp)
 		//cout << "*itrCounts : " << *itrCounts << "\n" ;
 		*itrCounts += 1;
 		return;
-	} 
+	}
 	else {
 		auto itrMins = this->_mins.begin();
-		advance(itrMins, i); 
+		advance(itrMins, i);
 		_mins.insert( itrMins, h);
 		_mins.pop_back();
 		// cout << "mins list\n";
@@ -351,11 +352,11 @@ uint64_t MurmurHash64A ( const void * key, int len, unsigned int seed )
 	while(data != end)
 	{
 		uint64_t k = *data++;
-		k *= m; 
-		k ^= k >> r; 
+		k *= m;
+		k ^= k >> r;
 		k *= m;
 		h ^= k;
-		h *= m; 
+		h *= m;
 	}
 	const unsigned char * data2 = (const unsigned char*)data;
 	switch(len & 7)
@@ -415,7 +416,7 @@ void test_jaccard_2_difflen(){
 	cout << "test_jaccard_1 : " << (E1.jaccard(E2) == (float)4/5) ? true : false;
 	cout << endl;
 	cout << "test_jaccard_1 : " << (E2.jaccard(E1) == (float)4/4) ? true : false;
-	cout << endl;	
+	cout << endl;
 }
 
 void test_yield_overlaps(){
@@ -455,5 +456,3 @@ int main()
 	return 0;
 }
 #endif
-
-
